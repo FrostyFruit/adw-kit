@@ -1,0 +1,332 @@
+{
+  "run_id": "20261001-061108-annual-growth-plan",
+  "ticket": {
+    "id": "20261001-061108-annual-growth-plan",
+    "type": "feature",
+    "summary": "add an annual version of the growth plan, billed yearly",
+    "source": "self"
+  },
+  "base_ref": "27fba8e62fa9cac441160576dae567eb8b3fa3f7",
+  "stage": "done",
+  "status": "passed",
+  "history": [
+    {
+      "stage": "scout",
+      "status": "passed",
+      "started_at": "2026-10-01T06:11:13Z",
+      "ended_at": "2026-10-01T06:11:33Z",
+      "duration_seconds": 20,
+      "note": "Scouted: ticket lands entirely in protected src/billing.js (+ its test); 3 product decisions (edit sign-off, annual price, plan key) flagged for plan."
+    },
+    {
+      "stage": "plan",
+      "status": "waiting",
+      "started_at": "2026-10-01T06:11:50Z",
+      "ended_at": "2026-10-01T06:11:50Z",
+      "duration_seconds": 0,
+      "note": "Stopped for the human: 3 questions (billing.js sign-off, plan key, annual price)."
+    },
+    {
+      "stage": "plan",
+      "status": "passed",
+      "started_at": "2026-10-01T06:12:00Z",
+      "ended_at": "2026-10-01T06:12:05Z",
+      "duration_seconds": 5,
+      "note": "Plan restarted after human answers (billing.js approved; growth_annual at 990/yr); 5 criteria, 2 files."
+    },
+    {
+      "stage": "challenge",
+      "status": "passed",
+      "started_at": "2026-10-01T06:12:12Z",
+      "ended_at": "2026-10-01T06:14:15Z",
+      "duration_seconds": 123,
+      "note": "Round 1 (full, subagent): revise. 1 major (yearly interval unchecked; callers could charge 990 monthly) + 4 minors. Back to plan."
+    },
+    {
+      "stage": "plan",
+      "status": "waiting",
+      "started_at": "2026-10-01T06:14:25Z",
+      "ended_at": "2026-10-01T06:14:25Z",
+      "duration_seconds": 0,
+      "note": "Stopped for the human: challenge major (yearly interval invisible to callers) turned into question 4."
+    },
+    {
+      "stage": "plan",
+      "status": "passed",
+      "started_at": "2026-10-01T06:14:40Z",
+      "ended_at": "2026-10-01T06:14:41Z",
+      "duration_seconds": 1,
+      "note": "Addressed round 1: MAJOR (yearly invisible to callers) -> question 4, answered 'Go with your suggested answer'; accepted as risk + follow-up, per-year test title. Minors: diff criterion made mechanical; exact-message + near-miss throw; prototype bug -> follow-up, no prototype keys in tests; approver identity cannot be recorded by the kit (answers are word for word), one-entry limit held by criterion 4."
+    },
+    {
+      "stage": "challenge",
+      "status": "passed",
+      "started_at": "2026-10-01T06:14:46Z",
+      "ended_at": "2026-10-01T06:15:33Z",
+      "duration_seconds": 47,
+      "note": "Round 2 (delta, same subagent): approve, 0 majors, 1 minor (handover follow-ups not asserted by any criterion). Prose: no new blocker/major; criteria 3 and 4 checkable as written; 4 round-1 minors absorbed."
+    },
+    {
+      "stage": "build",
+      "status": "passed",
+      "started_at": "2026-10-01T06:15:40Z",
+      "ended_at": "2026-10-01T06:16:09Z",
+      "duration_seconds": 29,
+      "note": "Built: one-line PRICES entry growth_annual: 990 (approved protected edit) + 3 new tests/asserts; mutation-checked; not committed."
+    },
+    {
+      "stage": "verify",
+      "status": "passed",
+      "started_at": "2026-10-01T06:16:16Z",
+      "ended_at": "2026-10-01T06:16:37Z",
+      "duration_seconds": 21,
+      "note": "Attempt 1: test pass (# pass 7), copy-length pass (2 strings OK), run-file pass. Both gates run_when=always; none skipped."
+    },
+    {
+      "stage": "review",
+      "status": "passed",
+      "started_at": "2026-10-01T06:16:49Z",
+      "ended_at": "2026-10-01T06:18:29Z",
+      "duration_seconds": 100,
+      "note": "Fresh subagent, full round: approve, diff_lines 16, 5/5 met; 3 unscoped findings (none new behaviour; yearly-interval residual risk; pre-existing prototype lookup). Reviewer flagged build note 2 line range off by one (5-9 not 6-9)."
+    },
+    {
+      "stage": "handover",
+      "status": "passed",
+      "started_at": "2026-10-01T06:18:42Z",
+      "ended_at": "2026-10-01T06:19:12Z",
+      "duration_seconds": 30,
+      "note": "Handover written; 2 gotchas + architecture note harvested; 2 follow-ups filed (caller-side yearly billing, prototype lookup); 1 open question (approver identity)."
+    }
+  ],
+  "scout": {
+    "surface_files": [
+      "src/billing.js",
+      "test/billing.test.js"
+    ],
+    "relevant_docs": [
+      "CLAUDE.md",
+      ".claude/context/fragile.md",
+      ".claude/context/gotchas.md",
+      ".claude/context/architecture.md"
+    ],
+    "gotchas_hit": [
+      "billing.js changes what customers pay (gotchas.md): src/billing.js is under ## Protected in fragile.md; CLAUDE.md requires the founder's sign-off before editing it",
+      "Hardcoded user-facing strings (gotchas.md): if the annual plan needs any customer-facing label it must go in src/messages.js and pass the copy-length gate"
+    ],
+    "unknowns": [
+      "PRODUCT DECISION (protected path): may src/billing.js be edited for this ticket? It is the only place prices live, so the ticket cannot be done without it.",
+      "PRODUCT DECISION (pricing): what is the annual growth price? Today growth is 99 with no billing interval recorded; the annual price (12x99=1188, or a discounted figure) is a pricing decision.",
+      "PRODUCT DECISION: what plan key identifies the annual growth plan (e.g. growth_annual)? Callers pass this key to priceFor.",
+      "Technical: billing.js has no concept of a billing interval; PRICES is a flat plan->number map, so 'billed yearly' can only be expressed via the key and its price unless the data shape changes. Plan must decide whether an interval field is needed (it would widen scope).",
+      "Technical: priceFor uses `plan in PRICES`, which also matches inherited Object.prototype keys (e.g. 'toString'). Pre-existing; plan should decide whether it is in scope.",
+      "Technical: the existing billing test only covers 'starter'; growth and scale are untested, so an accidental change to them would not be caught."
+    ]
+  },
+  "plan": {
+    "acceptance_criteria": [
+      "priceFor('growth_annual') returns 990, proven by a test in test/billing.test.js whose title states the amount is per year",
+      "Existing prices are unchanged: priceFor('starter') === 49, priceFor('growth') === 99, priceFor('scale') === 199, each pinned by a test",
+      "Unknown plans still throw with the exact message: assert.throws(() => priceFor('growth_yearly'), { message: 'unknown plan: growth_yearly' }), plus the near-miss 'Growth_Annual' throws 'unknown plan: Growth_Annual' (no normalisation)",
+      "`git diff <base_ref> -- src/billing.js` shows exactly one changed line: `const PRICES = { starter: 49, growth: 99, scale: 199 }` becomes `const PRICES = { starter: 49, growth: 99, scale: 199, growth_annual: 990 }`; no other line in the file changes",
+      "The npm test and copy-length gates both pass"
+    ],
+    "files_to_touch": [
+      "src/billing.js",
+      "test/billing.test.js"
+    ],
+    "risky_assumptions": [
+      "'Billed yearly' is expressed only by a separate plan key whose price is the yearly amount; nothing in this repo records a billing interval",
+      "ACCEPTED RISK (human decision 4): external callers charge priceFor(plan) per billing period and will schedule growth_annual yearly. If a caller charges it monthly, a growth_annual customer is overcharged 12x. This repo cannot check it; handover files the caller-side work as a follow-up"
+    ],
+    "out_of_scope": [
+      "Adding a billing-interval field or changing the PRICES data shape",
+      "Making external callers charge, display or prorate growth_annual yearly (follow-up ticket at handover, per human decision 4)",
+      "Annual versions of starter or scale",
+      "Proration, switching between monthly and annual, discounts logic",
+      "Any user-facing copy (no messages.js change)",
+      "The pre-existing `plan in PRICES` prototype-chain lookup in priceFor (priceFor('toString') returns a function): needs its own founder sign-off; handover files it as a follow-up ticket. Negative tests must not use prototype keys"
+    ],
+    "questions_for_human": [
+      "May I edit src/billing.js for this ticket? (Protected in fragile.md: founder sign-off required.) Suggested answer: yes, only to add one new PRICES entry.",
+      "What plan key should the annual growth plan use? Suggested answer: growth_annual.",
+      "What is the annual growth price? Suggested answer: 1188 (12 x 99, no discount), unless you want an annual discount.",
+      "Code outside this repo charges and displays priceFor(plan), and nothing here tells it a plan is yearly. Will that code charge growth_annual (990) once per year, and who owns making it do so? Suggested answer: yes, 990 is a once-a-year charge; the external billing caller owns scheduling it yearly; this ticket only adds the price (no interval field), and handover files the caller-side work as a follow-up ticket."
+    ],
+    "human_decisions": [
+      {
+        "question": "May I edit src/billing.js for this ticket? (Protected in fragile.md: founder sign-off required.) Suggested answer: yes, only to add one new PRICES entry.",
+        "answer": "Yes, you may edit src/billing.js for this ticket. The plan key is growth_annual and the price is 990 a year."
+      },
+      {
+        "question": "What plan key should the annual growth plan use? Suggested answer: growth_annual.",
+        "answer": "Yes, you may edit src/billing.js for this ticket. The plan key is growth_annual and the price is 990 a year."
+      },
+      {
+        "question": "What is the annual growth price? Suggested answer: 1188 (12 x 99, no discount), unless you want an annual discount.",
+        "answer": "Yes, you may edit src/billing.js for this ticket. The plan key is growth_annual and the price is 990 a year."
+      },
+      {
+        "question": "Code outside this repo charges and displays priceFor(plan), and nothing here tells it a plan is yearly. Will that code charge growth_annual (990) once per year, and who owns making it do so? Suggested answer: yes, 990 is a once-a-year charge; the external billing caller owns scheduling it yearly; this ticket only adds the price (no interval field), and handover files the caller-side work as a follow-up ticket.",
+        "answer": "Go with your suggested answer."
+      }
+    ]
+  },
+  "challenge": {
+    "rounds": [
+      {
+        "round": 1,
+        "mode": "full",
+        "challenged_by": "subagent",
+        "verdict": "revise",
+        "findings": [
+          {
+            "severity": "major",
+            "finding": "The 'billed yearly' half of the ticket has no acceptance criterion, and nothing in this repo can check it. All five criteria prove one thing: a lookup returns 990. Whether a customer is actually billed once a year depends entirely on the external callers. The plan's own risky_assumptions say so: priceFor's result is assumed to be 'the amount charged per billing period', and no interval is recorded anywhere. A caller only knows a key is yearly if it parses the key string. If any external caller charges priceFor(plan) on a fixed monthly cycle, a growth_annual customer is charged 990 every month: 11,880 a year instead of 990, a 12x overcharge. The same applies to any caller that shows the price as '/mo', computes MRR, or works out an upgrade difference such as priceFor(new) - priceFor(old) (growth to growth_annual would read as +891 for the same period). The human approved '990 a year' but was never asked whether the callers know growth_annual is yearly. That question appears only as an assumption, not in questions_for_human, so it was never answered.",
+            "suggested_fix": "Add a question for the founder and record the answer in human_decisions: 'External code that charges or displays priceFor(plan) has no interval information. Will it charge growth_annual once per year? Who owns making it do so?' If the answer is yes, add a criterion that the handover names this caller-side requirement explicitly: growth_annual returns a yearly amount and must be scheduled yearly. If the answer is no or unknown, the ticket cannot be finished by a PRICES entry alone. Either widen the scope with explicit founder approval, for example by exporting an interval for each key, which is a protected-file change beyond the one-entry approval, or stop and escalate."
+          },
+          {
+            "severity": "minor",
+            "finding": "The criterion 'The only change to src/billing.js is one new PRICES entry' is right, but it does not say how to check it. PRICES is a one-line object literal, so a builder who reformats it onto several lines 'for readability' breaks the criterion while every test still passes.",
+            "suggested_fix": "Make the check mechanical: `git diff src/billing.js` shows exactly one changed line, `{ starter: 49, growth: 99, scale: 199 }` becoming `{ starter: 49, growth: 99, scale: 199, growth_annual: 990 }`. No other line in the file changes."
+          },
+          {
+            "severity": "minor",
+            "finding": "The unknown-plan test could pass without proving the error message. A bare assert.throws(() => priceFor('growth_yearly')) passes on any throw. Near-miss keys a caller might realistically send are also not covered: 'Growth_Annual', 'growth-annual', 'growth_annual ' with a trailing space. These should throw, not be normalized into a match.",
+            "suggested_fix": "Use assert.throws(() => priceFor('growth_yearly'), { message: 'unknown plan: growth_yearly' }). Optionally add one near-miss case, such as 'Growth_Annual', to pin that no normalization happens."
+          },
+          {
+            "severity": "minor",
+            "finding": "The prototype-chain lookup is correctly kept out of scope, because the protected-file approval covers only this ticket's entry. But it is a live pricing defect: `plan in PRICES` lets priceFor('toString') and priceFor('constructor') return a function instead of throwing. Leaving it only in out_of_scope means it is never seen again. Also, any 'unknown plan' test the builder adds must not use a prototype key, or it will fail, or worse, be written to pin the buggy behaviour.",
+            "suggested_fix": "Have the handover file this as a separate ticket that needs its own founder sign-off. Keep negative-test inputs to non-prototype names."
+          },
+          {
+            "severity": "minor",
+            "finding": "The protected-path approval does exist in human_decisions. But all three questions carry the same pasted answer, and the record does not say who gave it. CLAUDE.md requires the founder's sign-off specifically. The plan's suggested limit ('only to add one new PRICES entry') appears in the question, not in the answer. Criterion 4 imposes that limit on the plan itself, which is good, but the approval as recorded is broader.",
+            "suggested_fix": "Record that the approver is the founder. Note that the edit is held to the one-entry limit by criterion 4, not by the wording of the approval."
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "mode": "delta",
+        "challenged_by": "subagent",
+        "verdict": "approve",
+        "findings": [
+          {
+            "severity": "minor",
+            "finding": "FIXED: the 'billed yearly' major. Its core was that the caller-side interval question was never put to the human, so it was never answered. It now is: question 4, answered 'Go with your suggested answer'. On record: 990 is charged once a year, the external billing caller owns scheduling it yearly, and the caller-side work is a follow-up. The 12x-overcharge risk is now labelled ACCEPTED RISK in risky_assumptions, and the caller-side work is listed in out_of_scope. One part of the suggested fix was not taken, and this is the only remaining gap. The promise that 'handover files the caller-side work as a follow-up ticket' appears only in risky_assumptions and out_of_scope. Neither is an acceptance criterion. So nothing in review or verify checks that the follow-up ticket gets filed, and if it is dropped, the external callers never learn that growth_annual is yearly. The real-world exposure is partly self-limiting: PRICES is not exported, so a customer can only be put on growth_annual by a caller that already knows the key exists.",
+            "suggested_fix": "Optional. Make the follow-up checkable at handover: the handover doc must name the filed caller-side ticket, saying growth_annual returns a yearly amount and must be charged yearly, and also the prototype-lookup ticket. Or add this as a criterion the handover stage asserts."
+          }
+        ]
+      }
+    ],
+    "verdict": "approve"
+  },
+  "build": {
+    "files_changed": [
+      "src/billing.js",
+      "test/billing.test.js"
+    ],
+    "deviations_from_plan": [
+      "Criterion 2 ('each pinned by a test'): growth and scale were added as asserts inside the existing 'known plans have prices' test rather than as three separate test() blocks. Each price has its own assert.equal; any one changing fails that test.",
+      "Round 1 minor 5 (record that the approver is the founder): not done. plan.human_decisions records answers word for word and the human did not state their role; build cannot add it without inventing it.",
+      "Round 2 minor (follow-up tickets not asserted by any criterion): not a build concern; left for handover to file (caller-side yearly charging, prototype-chain lookup)."
+    ],
+    "notes_for_reviewer": [
+      "src/billing.js: exactly one line changed (line 2), PRICES gains `growth_annual: 990`. Nothing else in the file changed. Approved in plan.human_decisions[0].",
+      "test/billing.test.js line 6-9: 'known plans have prices' now asserts starter 49, growth 99, scale 199.",
+      "test/billing.test.js line 11-13: new test 'growth_annual costs 990 per year' asserts priceFor('growth_annual') === 990 (title states per year, per criterion 1 and human decision 4).",
+      "test/billing.test.js line 15-17: 'unknown plans throw with the plan name' uses assert.throws with { message: 'unknown plan: growth_yearly' } (round 1 minor 3).",
+      "test/billing.test.js line 19-21: 'plan keys are not normalised' asserts 'Growth_Annual' throws 'unknown plan: Growth_Annual' (round 1 minor 3 near-miss).",
+      "No negative test uses a prototype key such as 'toString' (round 1 minor 4); the prototype-chain lookup is untouched and out of scope.",
+      "Round 1 major and minor 2 were absorbed by the revised plan (question 4, mechanical diff criterion); nothing extra was needed in code.",
+      "I checked the new test bites: with src/billing.js restored to base_ref, `node --test` reported 'not ok 2 - growth_annual costs 990 per year' (# pass 6, # fail 1); restored the change afterwards (# pass 7, # fail 0).",
+      "Nothing committed. No change to src/messages.js, so the copy-length gate's input is unchanged."
+    ]
+  },
+  "verify": {
+    "attempt": 1,
+    "max_attempts": 3,
+    "checks": [
+      {
+        "name": "test",
+        "command": "npm test",
+        "exit_code": 0,
+        "verdict": "pass",
+        "attempt": 1,
+        "output_tail": "# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 41.337791"
+      },
+      {
+        "name": "copy-length",
+        "command": "node scripts/check-copy.mjs",
+        "exit_code": 0,
+        "verdict": "pass",
+        "attempt": 1,
+        "output_tail": "check-copy: 2 strings OK"
+      },
+      {
+        "name": "run-file",
+        "command": "node scripts/adw-run.mjs check 20261001-061108-annual-growth-plan",
+        "exit_code": 0,
+        "verdict": "pass",
+        "attempt": 1,
+        "output_tail": "adw-run check: OK (.claude/adw/runs/20261001-061108-annual-growth-plan.json)"
+      }
+    ]
+  },
+  "review": {
+    "verdict": "approve",
+    "diff_lines": 16,
+    "criteria_results": [
+      {
+        "criterion": "priceFor('growth_annual') returns 990, proven by a test in test/billing.test.js whose title states the amount is per year",
+        "met": true,
+        "evidence": "src/billing.js:2 `const PRICES = { starter: 49, growth: 99, scale: 199, growth_annual: 990 }`; test/billing.test.js:11-13 `test('growth_annual costs 990 per year', () => { assert.equal(priceFor('growth_annual'), 990) })`. My own `npm test` run (exit 0) printed `ok 2 - growth_annual costs 990 per year`. I checked that the test catches a regression without editing any file: I loaded the base_ref billing.js in memory, and priceFor('growth_annual') throws 'unknown plan: growth_annual', so test 2 would fail against base. This matches build note 8."
+      },
+      {
+        "criterion": "Existing prices are unchanged: priceFor('starter') === 49, priceFor('growth') === 99, priceFor('scale') === 199, each pinned by a test",
+        "met": true,
+        "evidence": "In src/billing.js:2 the existing entries keep their values (starter: 49, growth: 99, scale: 199). They are pinned by test/billing.test.js:6 `assert.equal(priceFor('starter'), 49)`, :7 `assert.equal(priceFor('growth'), 99)` and :8 `assert.equal(priceFor('scale'), 199)`, all inside test 'known plans have prices' (lines 5-9). That test passes as `ok 1`. Lines 7-8 are new; base only pinned starter. Small mismatch: build note 2 puts this test at 'line 6-9', but it actually starts at line 5. Its content matches the note."
+      },
+      {
+        "criterion": "Unknown plans still throw with the exact message: assert.throws(() => priceFor('growth_yearly'), { message: 'unknown plan: growth_yearly' }), plus the near-miss 'Growth_Annual' throws 'unknown plan: Growth_Annual' (no normalisation)",
+        "met": true,
+        "evidence": "test/billing.test.js:16 `assert.throws(() => priceFor('growth_yearly'), { message: 'unknown plan: growth_yearly' })` (test 'unknown plans throw with the plan name', ok 3). test/billing.test.js:20 `assert.throws(() => priceFor('Growth_Annual'), { message: 'unknown plan: Growth_Annual' })` (test 'plan keys are not normalised', ok 4). The throw path at src/billing.js:5 is unchanged and has no case folding."
+      },
+      {
+        "criterion": "`git diff <base_ref> -- src/billing.js` shows exactly one changed line: `const PRICES = { starter: 49, growth: 99, scale: 199 }` becomes `const PRICES = { starter: 49, growth: 99, scale: 199, growth_annual: 990 }`; no other line in the file changes",
+        "met": true,
+        "evidence": "`git diff 27fba8e -- src/billing.js` has one hunk: `-const PRICES = { starter: 49, growth: 99, scale: 199 }` / `+const PRICES = { starter: 49, growth: 99, scale: 199, growth_annual: 990 }`. numstat for src/billing.js is `1 1`. Lines 1 and 3-7 are byte-identical to `git show 27fba8e:src/billing.js`."
+      },
+      {
+        "criterion": "The npm test and copy-length gates both pass",
+        "met": true,
+        "evidence": "verify.checks: 'test' `npm test` exit_code 0 (`# fail 0`); 'copy-length' `node scripts/check-copy.mjs` exit_code 0 (`check-copy: 2 strings OK`). I re-ran both: `npm test` exit 0 with tests 7, pass 7, fail 0; `node scripts/check-copy.mjs` exit 0 with `check-copy: 2 strings OK`. src/messages.js is not in the diff, so the copy gate's input did not change."
+      }
+    ],
+    "unscoped_findings": [
+      "The change adds no behaviour beyond the criteria. Only src/billing.js (1 line) and test/billing.test.js (+14 lines) changed. No untracked or ignored files exist outside .claude/adw. HEAD is still base_ref 27fba8e, so nothing was committed, as build note 9 says.",
+      "Residual risk, not blocking (accepted in human_decisions[3]): nothing in the code says growth_annual is yearly. priceFor returns a bare 990 that looks the same as the monthly prices, and the 'per year' wording exists only in the test title. An external caller that charges priceFor(plan) every month would charge 990 a month. Under the ruling, the caller owns yearly scheduling and handover must file that caller-side follow-up ticket. That ticket is not in this diff, and handover has to produce it.",
+      "Not introduced by this change, noted for completeness: priceFor uses `plan in PRICES` (src/billing.js:5), which also matches keys inherited from the prototype. So priceFor('toString') returns a function instead of throwing. This was already true at base_ref, is unchanged here, and build note 6 marks it out of scope."
+    ],
+    "reviewed_by": "subagent",
+    "final_round": "full"
+  },
+  "handover": {
+    "doc_path": "docs/adw/handovers/20261001-061108-annual-growth-plan.md",
+    "new_gotchas": [
+      "Plan keys carry no billing interval",
+      "priceFor matches prototype keys"
+    ],
+    "context_files_updated": [
+      ".claude/context/gotchas.md",
+      ".claude/context/architecture.md"
+    ],
+    "follow_up_tickets": [
+      "Caller-side yearly billing: external callers that charge/display/compute MRR/diff priceFor(plan) must treat growth_annual (990) as a once-a-year amount (owner: external billing caller)",
+      "priceFor prototype-chain lookup: replace `plan in PRICES` with an own-property check so priceFor('toString') throws (protected file: needs founder sign-off)"
+    ]
+  },
+  "terminal_reason": "completed"
+}

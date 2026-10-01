@@ -1,0 +1,504 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ADW Run State",
+  "description": "One file per ticket. Every stage reads it and writes its own section. The file is the run: if it is not recorded here, it did not happen.",
+  "type": "object",
+  "required": [
+    "run_id",
+    "ticket",
+    "base_ref",
+    "stage",
+    "status",
+    "history"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "description": "UTC timestamp plus slug: `date -u +%Y%m%d-%H%M%S`-<slug>. UTC so it lines up with the stamps."
+    },
+    "ticket": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "summary"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "feature",
+            "bug",
+            "chore",
+            "hotfix",
+            "refactor"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "description": "Optional. Where the ticket came from: a user report, an issue link, \"self\"."
+        }
+      }
+    },
+    "base_ref": {
+      "type": "string",
+      "description": "The commit SHA the run started from (`git rev-parse HEAD` at scout). The reviewer diffs against THIS, so it sees every change the run made, committed or not."
+    },
+    "stage": {
+      "enum": [
+        "scout",
+        "plan",
+        "challenge",
+        "build",
+        "verify",
+        "review",
+        "handover",
+        "done"
+      ],
+      "description": "The stage in progress, or the last one that ran. Set automatically by `adw-stamp.sh <run> <stage> start`. Handover sets \"done\"."
+    },
+    "status": {
+      "enum": [
+        "in_progress",
+        "passed",
+        "failed",
+        "blocked"
+      ],
+      "description": "\"in_progress\" for the whole run, \"passed\" once handover closes it, \"blocked\" when a stage stops it (adw-stamp.sh end ... blocked sets this)."
+    },
+    "scout": {
+      "type": "object",
+      "properties": {
+        "surface_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "relevant_docs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gotchas_hit": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "properties": {
+        "acceptance_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "files_to_touch": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "risky_assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "out_of_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "questions_for_human": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product decisions the plan must not guess: wording customers see, whether something is required, prices, anything a customer would notice. If non-empty, the run STOPS at plan until the human answers."
+        },
+        "human_decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": {
+                "type": "string"
+              },
+              "answer": {
+                "type": "string"
+              },
+              "by": {
+                "type": "string",
+                "description": "Who answered: a name or a role. A sign-off must say whose it is."
+              }
+            }
+          },
+          "description": "The human's answers, word for word, one per question."
+        }
+      }
+    },
+    "challenge": {
+      "type": "object",
+      "description": "One entry per challenge round, appended, never overwritten. `verdict` mirrors the latest round.",
+      "properties": {
+        "verdict": {
+          "enum": [
+            "approve",
+            "revise",
+            "reject"
+          ]
+        },
+        "rounds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "round": {
+                "type": "integer"
+              },
+              "mode": {
+                "enum": [
+                  "full",
+                  "delta"
+                ],
+                "description": "full = a fresh challenger attacked the whole plan. delta = the SAME challenger checked its own findings were fixed."
+              },
+              "challenged_by": {
+                "enum": [
+                  "subagent",
+                  "self"
+                ]
+              },
+              "verdict": {
+                "enum": [
+                  "approve",
+                  "revise",
+                  "reject"
+                ]
+              },
+              "findings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "severity": {
+                      "enum": [
+                        "blocker",
+                        "major",
+                        "minor"
+                      ]
+                    },
+                    "finding": {
+                      "type": "string"
+                    },
+                    "suggested_fix": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "build": {
+      "type": "object",
+      "properties": {
+        "files_changed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deviations_from_plan": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes_for_reviewer": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "verify": {
+      "type": "object",
+      "properties": {
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "command",
+              "exit_code",
+              "verdict"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string"
+              },
+              "exit_code": {
+                "type": "integer",
+                "description": "OBSERVED by scripts/adw-gate.sh. Never inferred from output text."
+              },
+              "verdict": {
+                "enum": [
+                  "pass",
+                  "fail",
+                  "suspect"
+                ],
+                "description": "From adw-gate.sh. `suspect` (exit 0 but no proof of work) counts as a failure."
+              },
+              "output_tail": {
+                "type": "string"
+              },
+              "failure_class": {
+                "enum": [
+                  "code",
+                  "environment",
+                  "unclassified"
+                ],
+                "description": "REQUIRED when the check did not pass. `code` = a real defect, go back to build. `environment` = machine, network or toolchain problem the change cannot fix: fix the environment and RERUN, never skip. `unclassified` = cannot decide yet; treated as a failure until evidence decides it."
+              },
+              "failure_evidence": {
+                "type": "string",
+                "description": "The exact output line(s) that justify failure_class. A classification with no quoted line is not a classification."
+              },
+              "attempt": {
+                "type": "integer",
+                "description": "Which verify attempt produced this check. Re-attempts APPEND new entries; earlier attempts stay as the record."
+              },
+              "log_path": {
+                "type": "string",
+                "description": "Full output log (temporary; the output_tail is the durable copy)."
+              }
+            }
+          }
+        },
+        "attempt": {
+          "type": "integer",
+          "description": "Current attempt, starting at 1. Set it BEFORE running the gates; adw-gate.sh --into tags each check with it. \"Verify passed\" means every check with this attempt number has verdict pass."
+        },
+        "max_attempts": {
+          "type": "integer",
+          "default": 3
+        },
+        "blocked_reason": {
+          "type": "string"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "verdict": {
+          "enum": [
+            "approve",
+            "revise",
+            "reject"
+          ]
+        },
+        "criteria_results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "criterion": {
+                "type": "string"
+              },
+              "met": {
+                "type": "boolean"
+              },
+              "evidence": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "reviewed_by": {
+          "enum": [
+            "subagent",
+            "self"
+          ],
+          "description": "`subagent` = judged by a fresh agent that did not write the change. `self` = the same agent reviewed its own work, which is structurally weak and must be recorded as such."
+        },
+        "unscoped_findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Behaviour the change introduces that NO acceptance criterion asked for. A finding even when every criterion passes."
+        },
+        "diff_lines": {
+          "type": "integer",
+          "description": "Lines of change the reviewer actually read. 0 means it reviewed NOTHING, and an approve carrying 0 is rejected."
+        },
+        "final_round": {
+          "enum": [
+            "full",
+            "delta"
+          ],
+          "description": "full = a fresh reviewer read the whole change. delta = the same reviewer checked its flagged items were fixed. Round count comes from history."
+        },
+        "review_mode": {
+          "enum": [
+            "full",
+            "delta"
+          ],
+          "description": "As returned by the reviewer on a delta round. Mirror it into final_round."
+        }
+      },
+      "description": "The reviewer's JSON, written exactly as returned. Extra keys the reviewer adds are kept."
+    },
+    "handover": {
+      "type": "object",
+      "properties": {
+        "doc_path": {
+          "type": "string"
+        },
+        "new_gotchas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "context_files_updated": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "follow_up_tickets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "history": {
+      "type": "array",
+      "description": "Written ONLY by scripts/adw-stamp.sh (plus the `note` field, which the agent fills in place).",
+      "items": {
+        "type": "object",
+        "required": [
+          "stage",
+          "status",
+          "started_at",
+          "ended_at"
+        ],
+        "properties": {
+          "stage": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "waiting",
+              "blocked",
+              "failed"
+            ],
+            "description": "passed = the stage did its job. waiting = it stopped to ask the human. blocked = the run cannot continue."
+          },
+          "started_at": {
+            "type": "string"
+          },
+          "ended_at": {
+            "type": "string"
+          },
+          "duration_seconds": {
+            "type": "integer"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "terminal_reason": {
+      "enum": [
+        "completed",
+        "blocked_environment",
+        "blocked_max_attempts",
+        "blocked_protected_area",
+        "blocked_needs_human_decision",
+        "rejected_unsound",
+        "abandoned"
+      ],
+      "description": "REQUIRED once stage is `done` or status is `blocked`. Why the run ended, as a value you can count rather than a story you have to read."
+    },
+    "stamps": {
+      "type": "object",
+      "description": "adw-stamp.sh staging area for a stage that has started and not ended. Must be empty or absent on a finished run.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "started_at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "refusals": {
+      "type": "array",
+      "description": "Every point where a stage DECLINED to proceed, whether or not the run later recovered. Append-only; never rewritten when a later attempt succeeds. A loop that never refuses is either well-fed or not looking.",
+      "items": {
+        "type": "object",
+        "required": [
+          "stage",
+          "reason",
+          "at",
+          "unaided"
+        ],
+        "properties": {
+          "stage": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "at": {
+            "type": "string",
+            "description": "ISO-8601 UTC from a real `date -u +%Y-%m-%dT%H:%M:%SZ` call."
+          },
+          "unaided": {
+            "type": "boolean",
+            "description": "TRUE only if no human input preceded the refusal."
+          },
+          "recovered": {
+            "type": "boolean"
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
