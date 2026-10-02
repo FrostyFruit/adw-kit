@@ -1,6 +1,6 @@
 # ADW: a coding loop your codebase learns from
 
-A free kit of Claude Code commands that turns "ask the AI to build it" into a small,
+A free kit of commands for coding agents that turns "ask the AI to build it" into a small,
 disciplined team: a scout, a planner, a devil's advocate, a builder, an inspector, an
 outside reviewer and a note-taker. Every ticket goes through the same seven steps, and
 every ticket leaves the codebase a little smarter for the next one.
@@ -67,7 +67,9 @@ and it compounds.
 
 ## Set up in 10 minutes
 
-You need: [Claude Code](https://claude.com/claude-code), git, and Node 18 or newer (for the small scripts).
+You need: a coding agent that can read files and run terminal commands, git, and Node 18 or
+newer (for the small scripts). Built and tested in [Claude Code](https://claude.com/claude-code);
+see "Other coding agents" below for anything else.
 
 1. Copy the kit into your repo:
    ```sh
@@ -78,7 +80,8 @@ You need: [Claude Code](https://claude.com/claude-code), git, and Node 18 or new
    cp adw-kit/scripts/adw-*  your-repo/scripts/
    chmod +x your-repo/scripts/adw-*.sh
    ```
-2. In Claude Code, inside your repo: `/adw-bootstrap`
+2. In your coding agent, inside your repo: `/adw-bootstrap` (in Claude Code it is a slash
+   command; in other agents, see "Other coding agents" below)
 3. Read its report. **Correct anything it got wrong.** This is the most valuable ten
    minutes you will spend: you know things about your codebase that are not written down.
 4. Commit what it wrote (`.claude/context/` and `docs/adw/`). Each run compares against
@@ -113,6 +116,46 @@ it touches anything you marked as protected.
   every future run looking for something that does not exist.
 - **The loop proposes, you decide.** `/adw-eval` suggests changes. Nothing changes until a
   small practice run has proved the change actually works.
+
+## Other coding agents
+
+The commands are plain markdown instructions and the scripts are plain bash and Node, so any
+coding agent that can read files and run terminal commands can follow them. Codex, Cursor and
+others all qualify. Two things change by tool:
+
+1. **How you run a step.** If your agent supports custom commands, put the `adw-*.md` files
+   where it expects them. If not, just tell it: *"Follow `.claude/commands/adw-scout.md` with
+   the ticket: the signup form accepts an empty email."* Each file ends by naming the next one.
+2. **The fresh reviewer and the devil's advocate.** These steps hand the work to a separate
+   agent that did not write it. If your tool cannot start one, open a brand-new chat, paste
+   the prompt from `adw-review.md` (or `adw-challenge.md`), and bring the answer back. A new
+   chat still counts as fresh. The same chat reviewing its own work does not.
+
+The kit was built and tested in Claude Code. Other agents should work the same way, but they
+have not been through the practice runs below.
+
+## Pick a model per step
+
+Every step is its own command, so you do not have to run the whole loop on your most
+expensive model.
+
+| Step | What it mostly does | Model |
+|---|---|---|
+| scout, verify | reads files, runs commands | a fast, cheap model |
+| build | writes code | a strong coding model |
+| plan, challenge, review | judgement | your strongest model |
+| handover | writes lessons future runs will follow | strong; the lessons compound |
+
+A reviewer on a different model from the builder is one more way of not grading your own
+homework.
+
+**In Claude Code**, add one line to the frontmatter at the top of a command file, for example
+`model: haiku` in `adw-scout.md` or `model: opus` in `adw-review.md`. It applies only while that
+command runs, then the session goes back to its usual model. **In other agents**, pick the
+model for the chat or session you run that step in.
+
+The savings have not been measured yet. `/adw-eval` reports time per stage, so you can see
+where the cost goes before you choose.
 
 ## Tested before it shipped
 
@@ -159,8 +202,8 @@ broken before.
 meant." The loop is designed so the important decisions come back to you as plain
 questions, with a suggested answer.
 
-**Does it work outside Claude Code?** The commands are plain markdown prompts, so you can
-adapt them. They are written for Claude Code slash commands and subagents.
+**Does it work outside Claude Code?** Yes, with a little setup. See "Other coding agents"
+above. It was built and tested in Claude Code.
 
 **What should I commit?** At the end of each ticket, one commit: the code, its run file,
 its handover doc and any lessons added to the context files. Lessons travel with their code,
